@@ -9,12 +9,15 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "firebase": "^5.8.2",
     "vue": "^2.5.22",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0"
   },
   "devDependencies": {
+    "@types/firebase": "^3.2.1",
     "@types/jest": "^23.1.4",
+    "@types/node": "^11.9.0",
     "@vue/cli-plugin-typescript": "^3.4.0",
     "@vue/cli-plugin-unit-jest": "^3.4.0",
     "@vue/cli-service": "^3.4.0",
