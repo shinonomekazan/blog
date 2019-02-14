@@ -1,5 +1,5 @@
 import firebase from "firebase";
-import User from "../models/User";
+import {User} from "../models/User";
 
 export function createUser(firebaseUser: firebase.User): User {
 	return {

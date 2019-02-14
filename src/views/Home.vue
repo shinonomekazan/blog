@@ -2,13 +2,14 @@
 	<div id="app">
 		<img alt="Vue logo" src="../assets/logo.png">
 		<SignIn v-bind:user="user" />
-		<HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+		<ul>
+			<li v-for="post in posts">{{post.subject}}</li>
+		</ul>
 	</div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import HelloWorld from "../components/HelloWorld.vue";
 import SignIn from "../components/SignIn.vue";
 import firebase from "firebase";
 import * as models from "../models";
@@ -25,19 +26,44 @@ import * as factories from "../factories";
 
 @Component({
 	components: {
-		HelloWorld,
 		SignIn,
 	},
 })
 export default class Home extends Vue {
 	user: models.User | null = null;
+	postRef: firebase.firestore.CollectionReference | null = null;
+	posts: models.Post[] = [];
+
+	async created() {
+		console.log("home created");
+		this.postRef = firebase.firestore().collection("posts");
+		try {
+			const posts = await this.postRef.get();
+			this.posts = [];
+			posts.forEach((post) => {
+				const data = post.data();
+				this.posts.push({
+					userId: data.userId,
+					subject: data.subject,
+					body: data.body,
+				});
+			});
+		} catch (err) {
+			console.error("get data error", err);
+		}
+	}
 
 	mounted() {
+		const currentUser = firebase.auth().currentUser;
+		if (currentUser != null) {
+			this.user = factories.createUser(currentUser);
+		}
 		firebase.auth().onAuthStateChanged((user) => {
 			if (user == null) {
 				this.user = null;
 			} else {
 				this.user = factories.createUser(user);
+				console.log(this.user);
 			}
 		}, (err) => {
 			console.error("error auth: ", err);
@@ -48,11 +74,11 @@ export default class Home extends Vue {
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+	font-family: 'Avenir', Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-align: center;
+	color: #2c3e50;
+	margin-top: 60px;
 }
 </style>

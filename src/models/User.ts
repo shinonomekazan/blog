@@ -3,5 +3,3 @@ export interface User {
 	name: string | null;
 	verified: boolean;
 }
-
-export default User;
