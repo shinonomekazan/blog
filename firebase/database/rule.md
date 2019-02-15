@@ -13,13 +13,15 @@ service cloud.firestore {
     function isValidPost(data) {
   		return true
       	&& request.auth.uid != null
-      	&& data.size() == 3
+      	&& data.size() == 5
       	&& data.subject != null
       	&& data.subject.size() < 200
         && data.userId == request.auth.uid
         && data.body != null
         && data.body.size() > 0
         && data.body.size() < 262144
+        && data.created != null
+        && data.updated != null
         ;
     }
     function isOwner() {
