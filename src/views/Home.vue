@@ -1,9 +1,9 @@
 <template>
 	<div id="app">
 		<img alt="Vue logo" src="../assets/logo.png">
-		<SignIn v-bind:user="user" />
+		<SignIn v-bind:user="store.user" />
 		<ul>
-			<li v-for="post in posts">{{post.subject}}</li>
+			<li v-for="(post, index) in posts" :key="index">{{index}}: {{post.subject}}</li>
 		</ul>
 	</div>
 </template>
@@ -14,6 +14,7 @@ import SignIn from "../components/SignIn.vue";
 import firebase from "firebase";
 import * as models from "../models";
 import * as factories from "../factories";
+import {store} from "../store";
 
 /* tslint:disable */
 // ◆クラススタイルVueコンポーネント
@@ -30,15 +31,15 @@ import * as factories from "../factories";
 	},
 })
 export default class Home extends Vue {
-	user: models.User | null = null;
 	postRef: firebase.firestore.CollectionReference | null = null;
 	posts: models.Post[] = [];
+	store = store;
 
 	async created() {
 		console.log("home created");
 		this.postRef = firebase.firestore().collection("posts");
 		try {
-			const posts = await this.postRef.get();
+			const posts = await this.postRef.orderBy("created", "desc").limit(100).get();
 			this.posts = [];
 			posts.forEach((post) => {
 				const data = post.data();
@@ -46,28 +47,13 @@ export default class Home extends Vue {
 					userId: data.userId,
 					subject: data.subject,
 					body: data.body,
+					created: data.created,
+					updated: data.updated,
 				});
 			});
 		} catch (err) {
 			console.error("get data error", err);
 		}
-	}
-
-	mounted() {
-		const currentUser = firebase.auth().currentUser;
-		if (currentUser != null) {
-			this.user = factories.createUser(currentUser);
-		}
-		firebase.auth().onAuthStateChanged((user) => {
-			if (user == null) {
-				this.user = null;
-			} else {
-				this.user = factories.createUser(user);
-				console.log(this.user);
-			}
-		}, (err) => {
-			console.error("error auth: ", err);
-		});
 	}
 }
 </script>

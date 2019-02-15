@@ -1,5 +1,5 @@
 <template>
-	<form id="post" v-on:submit.prevent="post">
+	<form id="post" @submit.prevent="post">
 		<div v-show="msg">{{msg}}</div>
 		<div>
 			タイトル: <input type="text" v-model="subject" placeholder="タイトル" aria-label="ブログの記事タイトル">
@@ -18,56 +18,34 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import firebase from "firebase";
 import * as models from "../models";
 import * as factories from "../factories";
+import {store} from "../store";
 
+@Component({})
 export default class Post extends Vue {
-	// あとでなんとかする
-	user: models.User | null = null;
+	store = store;
 	// @Prop() user!: models.User;
 	subject: string = "";
 	body: string = "";
-	msg: string = "";
-
-	created() {
-		console.log("post created");
-	}
-
-	activated() {
-		console.log("post activated");
-	}
-
-	mounted() {
-		console.log("post mounted");
-		const currentUser = firebase.auth().currentUser;
-		console.log("auth?", currentUser);
-		if (currentUser != null) {
-			this.user = factories.createUser(currentUser);
-		}
-		firebase.auth().onAuthStateChanged((user) => {
-			if (user == null) {
-				this.user = null;
-			} else {
-				this.user = factories.createUser(user);
-				console.log(this.user);
-			}
-		}, (err) => {
-			console.error("error auth: ", err);
-		});
-	}
+	msg: string = "Hello World";
 
 	async post() {
 		console.log("posted");
 		// TODO: validate
-		if (this.user == null) {
+		if (this.store.user == null) {
+			this.msg = "ログインしてください。";
 			return;
 		}
-		console.log(this.subject);
-		console.log(this.body);
+		const post = {
+			subject: this.subject,
+			body: this.body,
+			userId: this.store.user.id,
+			// ほんとはservervalueを使いたいが方法が謎
+			created: firebase.firestore.Timestamp.now(),
+			updated: firebase.firestore.Timestamp.now(),
+		} as models.Post;
+		console.log(post);
 		try {
-			await firebase.firestore().collection("posts").add({
-				subject: this.subject,
-				body: this.body,
-				userId: this.user.id,
-			} as models.Post);
+			await firebase.firestore().collection("posts").add(post);
 			this._clear();
 			this.msg = "投稿しました。";
 		} catch (err) {
