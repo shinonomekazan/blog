@@ -44,7 +44,7 @@ export default class Home extends Vue {
 			posts.forEach((post) => {
 				const data = post.data();
 				this.posts.push({
-					userId: data.userId,
+					// userId: data.userId,
 					subject: data.subject,
 					body: data.body,
 					created: data.created,

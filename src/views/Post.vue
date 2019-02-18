@@ -38,14 +38,13 @@ export default class Post extends Vue {
 		const post = {
 			subject: this.subject,
 			body: this.body,
-			userId: this.store.user.id,
-			// ほんとはservervalueを使いたいが方法が謎
+			// TODO: ほんとはservervalueを使いたいが方法が謎
 			created: firebase.firestore.Timestamp.now(),
 			updated: firebase.firestore.Timestamp.now(),
 		} as models.Post;
 		console.log(post);
 		try {
-			await firebase.firestore().collection("posts").add(post);
+			await firebase.firestore().collection("users").doc(this.store.user.id).collection("posts").add(post);
 			this._clear();
 			this.msg = "投稿しました。";
 		} catch (err) {

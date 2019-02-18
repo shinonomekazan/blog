@@ -1,8 +1,9 @@
 <template>
 	<div class="signin">
 		<template v-if="user">
-			ようこそ <span>{{user.name}}</span> さん
+			ようこそ <span>{{user.displayName}}</span> さん
 			<a @click="signOut" class="button--green">signOut</a>
+			<RegisterUser v-if="!user.registered" v-bind:user="user" />
 		</template>
 		<template v-else>
 			<a @click="signIn" class="button--green">signIn</a>
@@ -14,8 +15,13 @@
 import { Component, Prop, Vue, Mixins } from "vue-property-decorator";
 import firebase from "firebase";
 import * as models from "../models";
+import RegisterUser from "./RegisterUser.vue";
 
-@Component
+@Component({
+	components: {
+		RegisterUser,
+	},
+})
 export default class SignIn extends Vue {
 	@Prop() user!: models.User;
 
