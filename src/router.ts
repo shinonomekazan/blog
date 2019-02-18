@@ -1,7 +1,9 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Home from "./views/Home.vue";
-import Post from "./views/Post.vue";
+import PostForm from "./views/PostForm.vue";
+import User from "./views/User.vue";
+import UserPost from "./views/UserPost.vue";
 
 Vue.use(Router);
 
@@ -23,9 +25,21 @@ export default new Router({
 			component: () => import(/* webpackChunkName: "about" */ "./views/About.vue"),
 		},
 		{
-			path: "/post",
+			path: "/_do_post",
 			name: "post",
-			component: Post,
+			component: PostForm,
+		},
+		{
+			path: "/:userName",
+			name: "user",
+			component: User,
+			props: true,
+		},
+		{
+			path: "/:userName/:postId",
+			name: "user",
+			component: UserPost,
+			props: true,
 		},
 		// {
 		// 	path: "/post",

@@ -3,7 +3,7 @@
 		<template v-if="user">
 			ようこそ <span>{{user.displayName}}</span> さん
 			<a @click="signOut" class="button--green">signOut</a>
-			<RegisterUser v-if="!user.registered" v-bind:user="user" />
+			<RegisterUser v-if="!user.registered" :user="user" />
 		</template>
 		<template v-else>
 			<a @click="signIn" class="button--green">signIn</a>
@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Mixins } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import firebase from "firebase";
 import * as models from "../models";
 import RegisterUser from "./RegisterUser.vue";

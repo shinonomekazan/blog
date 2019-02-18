@@ -11,13 +11,12 @@ export interface Store {
 
 function getUserData(user: firebase.User): Promise<models.User> {
 	return new Promise((resolve, reject) => {
-		firebase.firestore().collection("users").doc(user.uid).get().then((doc) => {
-			console.log("doc", doc);
-			if (! doc.exists) {
+		firebase.firestore().collection("users").where("id", "==", user.uid).get().then((users) => {
+			if (users.docs.length === 0) {
 				resolve(factories.createUser(user));
 				return;
 			}
-			const storeUser = doc.data() as models.StoreUser;
+			const storeUser = users.docs[0].data() as models.StoreUser;
 			console.log(storeUser);
 			resolve(factories.createUser(user, storeUser));
 		}).catch(reject);

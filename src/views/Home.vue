@@ -1,11 +1,10 @@
 <template>
-	<div id="app">
-		<img alt="Vue logo" src="../assets/logo.png">
-		<SignIn v-bind:user="store.user" />
+	<div id="home">
+		<SignIn :user="store.user" />
 
-		<ul>
+		<ul class="toppost">
 			<li v-for="(post, index) in posts" :key="index">
-				<TopPost v-bind:post="post" />
+				<TopPost :post="post" />
 			</li>
 		</ul>
 	</div>
@@ -66,14 +65,3 @@ export default class Home extends Vue {
 	}
 }
 </script>
-
-<style>
-#app {
-	font-family: 'Avenir', Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	text-align: center;
-	color: #2c3e50;
-	margin-top: 60px;
-}
-</style>

@@ -21,20 +21,21 @@ import * as factories from "../factories";
 import {store} from "../store";
 
 @Component({})
-export default class Post extends Vue {
+export default class PostForm extends Vue {
 	store = store;
 	// @Prop() user!: models.User;
 	subject: string = "";
 	body: string = "";
-	msg: string = "Hello World";
+	msg: string = "";
 
 	async post() {
 		console.log("posted");
 		// TODO: validate
-		if (this.store.user == null) {
+		if (this.store.user == null || !this.store.user.registered) {
 			this.msg = "ログインしてください。";
 			return;
 		}
+		const registeredUser = this.store.user as models.RegisteredUser;
 		const post = {
 			subject: this.subject,
 			body: this.body,
@@ -44,7 +45,7 @@ export default class Post extends Vue {
 		} as models.Post;
 		console.log(post);
 		try {
-			await firebase.firestore().collection("users").doc(this.store.user.id).collection("posts").add(post);
+			await firebase.firestore().collection("users").doc(registeredUser.name).collection("posts").add(post);
 			this._clear();
 			this.msg = "投稿しました。";
 		} catch (err) {

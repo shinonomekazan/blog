@@ -1,7 +1,16 @@
 import firebase from "firebase";
-import {User, StoreUser, RegisteredUser} from "../models/User";
+import * as models from "../models/User";
 
-export function createUser(firebaseUser: firebase.User, storeUser?: StoreUser): User {
+export function createOwner(id: string, storeUser: models.StoreUser): models.Owner {
+	return {
+		id,
+		name: storeUser.name,
+		displayName: storeUser.displayName,
+		created: storeUser.created.toDate(),
+	};
+}
+
+export function createUser(firebaseUser: firebase.User, storeUser?: models.StoreUser): models.User {
 	if (storeUser == null) {
 		return {
 			id: firebaseUser.uid,
@@ -17,5 +26,5 @@ export function createUser(firebaseUser: firebase.User, storeUser?: StoreUser): 
 		name: storeUser.name,
 		displayName: storeUser.displayName,
 		created: storeUser.created.toDate(),
-	} as RegisteredUser;
+	} as models.RegisteredUser;
 }

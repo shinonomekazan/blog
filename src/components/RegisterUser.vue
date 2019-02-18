@@ -38,13 +38,14 @@ export default class RegisterUser extends Vue {
 			return;
 		}
 		const storeUser = {
+			id: this.user.id,
 			name: this.name,
 			displayName: this.displayName,
 			created: firebase.firestore.Timestamp.now(),
 		};
 		// TODO: nameにもユニーク制約をかけたい
 		// TODO: setしかなくcreateがない
-		firebase.firestore().collection("users").doc(this.user.id).set(storeUser).then((err) => {
+		firebase.firestore().collection("users").doc(storeUser.name).set(storeUser).then((err) => {
 			if (err != null) {
 				console.error("register user error", err);
 				return;

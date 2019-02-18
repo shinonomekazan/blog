@@ -6,6 +6,13 @@ export interface User {
 	verified: boolean;
 }
 
+export interface Owner {
+	id: string;
+	displayName: string;
+	name: string;
+	created: Date;
+}
+
 export interface StoreUser {
 	name: string;
 	displayName: string;
