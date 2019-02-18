@@ -2,8 +2,11 @@
 	<div id="app">
 		<img alt="Vue logo" src="../assets/logo.png">
 		<SignIn v-bind:user="store.user" />
+
 		<ul>
-			<li v-for="(post, index) in posts" :key="index">{{index}}: {{post.subject}}</li>
+			<li v-for="(post, index) in posts" :key="index">
+				<TopPost v-bind:post="post" />
+			</li>
 		</ul>
 	</div>
 </template>
@@ -11,6 +14,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import SignIn from "../components/SignIn.vue";
+import TopPost from "../components/TopPost.vue";
 import firebase from "firebase";
 import * as models from "../models";
 import * as factories from "../factories";
@@ -28,27 +32,32 @@ import {store} from "../store";
 @Component({
 	components: {
 		SignIn,
+		TopPost,
 	},
 })
 export default class Home extends Vue {
 	postRef: firebase.firestore.CollectionReference | null = null;
-	posts: models.Post[] = [];
+	posts: models.AllPost[] = [];
 	store = store;
 
 	async created() {
 		console.log("home created");
-		this.postRef = firebase.firestore().collection("posts");
+		this.postRef = firebase.firestore().collection("allPosts");
 		try {
+			// TODO: キャッシュのライフサイクル的なものを設定して強めにきかせたい
 			const posts = await this.postRef.orderBy("created", "desc").limit(100).get();
 			this.posts = [];
 			posts.forEach((post) => {
 				const data = post.data();
 				this.posts.push({
-					// userId: data.userId,
 					subject: data.subject,
 					body: data.body,
 					created: data.created,
 					updated: data.updated,
+					postRef: data.postRef,
+					userId: data.userId,
+					userName: data.userName,
+					userDisplayName: data.userDisplayName,
 				});
 			});
 		} catch (err) {

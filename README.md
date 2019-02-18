@@ -2,9 +2,13 @@
 
 ## このリポジトリについて
 
-フロントエンドのリハビリのため、Vue.jsとFirebaseを使ってはてなダイアリーの更新ができなくなった事で行き先を失ったブログ記事置き場を作ろうという試み。
+フロントエンドのリハビリのため、[Vue.js](https://jp.vuejs.org/index.html)と[Firebase](https://firebase.google.com/?hl=ja)を使って[はてなダイアリー](http://d.hatena.ne.jp/)の更新ができなくなった事で行き先を失ったブログ記事置き場を作ろうという試み。
 
-これも別にソースコードのライセンスは不要なのでMITにしたい。
+## サーバについて
+
+主に[こちらの記事](https://medium.com/google-cloud-jp/firestore2-920ac799345c)を参考に[Cloud Functions for Firebase](https://firebase.google.com/docs/functions/?hl=ja)も使っています。
+
+Firebase側のソースは一応分けているので、必要に応じて[blog-server](https://github.com/shinonomekazan/blog-server)を参照してください。
 
 ## LICENSE
 
@@ -12,7 +16,9 @@
 
 詳しくは[LICENSE](./LICENSE)をご参照ください。
 
-## なんか自動生成された文書
+## なんか自動生成されてた文書
+
+以下の文書は[Vue CLI 3](https://cli.vuejs.org/)が勝手に作ったやつ。
 
 ### Project setup
 ```
