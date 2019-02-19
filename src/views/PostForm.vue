@@ -39,9 +39,8 @@ export default class PostForm extends Vue {
 		const post = {
 			subject: this.subject,
 			body: this.body,
-			// TODO: ほんとはservervalueを使いたいが方法が謎
-			created: firebase.firestore.Timestamp.now(),
-			updated: firebase.firestore.Timestamp.now(),
+			created: firebase.firestore.FieldValue.serverTimestamp(),
+			updated: firebase.firestore.FieldValue.serverTimestamp(),
 		} as models.Post;
 		console.log(post);
 		try {
