@@ -42,6 +42,7 @@ export default class RegisterUser extends Vue {
 			name: this.name,
 			displayName: this.displayName,
 			created: firebase.firestore.FieldValue.serverTimestamp(),
+			postCount: 0,
 		};
 		// TODO: setしかなくcreateがない
 		firebase.firestore().collection("users").doc(storeUser.name).set(storeUser).then((err) => {
