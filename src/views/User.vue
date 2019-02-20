@@ -38,13 +38,11 @@ export default class User extends Vue {
 	@Prop({
 		required: false,
 		default: null,
-		type: Number,
-	}) after!: number | null;
+	}) since!: string | null;
 	@Prop({
-		required: false,
-		default: null,
-		type: Number,
-	}) before!: number | null;
+		required: true,
+		default: "desc",
+	}) order!: "asc" | "desc";
 	@Prop({
 		required: false,
 		default: 0,
@@ -65,12 +63,12 @@ export default class User extends Vue {
 	prevLink() {
 		if (this.firstPost == null) return "?";
 		if (this.page === 1) return "?";
-		return `?before=${this.firstPost.created.toMillis()}&page=${this.page - 1}`;
+		return `?since=${this.firstPost.id!}&order=asc&page=${this.page - 1}`;
 	}
 
 	nextLink() {
 		if (this.lastPost == null) return "?";
-		return `?after=${this.lastPost.created.toMillis()}&page=${this.page + 1}`;
+		return `?since=${this.lastPost.id!}&page=${this.page + 1}`;
 	}
 
 	hasPrev() {
@@ -83,30 +81,30 @@ export default class User extends Vue {
 		return (this.offset() + this.pagingCount) < this.user.postCount;
 	}
 
-	createQuery(userRef: firebase.firestore.DocumentReference) {
-		let postQuery = userRef.collection("posts")
-			.limit(this.pagingCount);
-		console.log("create query", this.after, this.before, this.page);
-		if (this.after != null) {
-			postQuery = postQuery.orderBy("created", "desc")
-				.startAfter(firebase.firestore.Timestamp.fromMillis(this.after));
-		} else if (this.before != null && this.page > 0) {
-			postQuery = postQuery.orderBy("created", "asc")
-				.startAfter(firebase.firestore.Timestamp.fromMillis(this.before));
-		} else {
-			postQuery = postQuery.orderBy("created", "desc");
+	async createQuery(userRef: firebase.firestore.DocumentReference) {
+		const postRef = userRef.collection("posts");
+		const postQuery = postRef.limit(this.pagingCount);
+		async function orderWithSince(query: firebase.firestore.Query, order: firebase.firestore.OrderByDirection, since: string) {
+			const sinceDoc = await (postRef.doc(since)).get();
+			if (! sinceDoc.exists) return query.orderBy("created", order);
+			return query.orderBy("created", order).startAfter(sinceDoc);
 		}
-
-		return postQuery;
+		if (this.order === "asc" && this.since != null) {
+			return orderWithSince(postQuery, "asc", this.since);
+		}
+		if (this.since != null) {
+			return orderWithSince(postQuery, "desc", this.since);
+		}
+		return postQuery.orderBy("created", "desc");
 	}
 
 	async created() {
-		console.log("user created", this.userName, this.before, this.after);
+		console.log("user created", this.userName, this.since, this.order, this.page);
 		const userRef = firebase.firestore().collection("users").doc(this.userName);
 		try {
 			const storeUser = await userRef.get();
-			const posts = await this.createQuery(userRef).get();
-			console.log("error wa koko desuka?")
+			const query = await this.createQuery(userRef);
+			const posts = await query.get();
 			this.user = factories.createOwner(this.userName, storeUser.data() as models.StoreUser);
 			this.posts = [];
 			posts.forEach((post) => {
@@ -116,12 +114,16 @@ export default class User extends Vue {
 					body: data.body,
 					created: data.created,
 					updated: data.updated,
+					id: post.id,
 				});
 			});
-			// TODO: ばっちい。
-			if (this.before != null && this.page > 0) {
+			if (this.order === "asc") {
 				this.posts = this.posts.reverse();
 			}
+			// TODO: ばっちい。
+			// if (this.before != null && this.page > 0) {
+			// 	this.posts = this.posts.reverse();
+			// }
 			if (this.posts.length > 0) {
 				this.lastPost = this.posts[this.posts.length - 1];
 				this.firstPost = this.posts[0];
