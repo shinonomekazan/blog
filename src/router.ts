@@ -7,6 +7,12 @@ import UserPost from "./views/UserPost.vue";
 
 Vue.use(Router);
 
+function getInt(param: string | string[] | null, defaultValue: null | number = null) {
+	if (param == null) return defaultValue;
+	if (typeof param === "string") return parseInt(param, 10);
+	return parseInt(param[0], 10);
+}
+
 export default new Router({
 	mode: "history",
 	base: process.env.BASE_URL,
@@ -33,7 +39,15 @@ export default new Router({
 			path: "/:userName",
 			name: "user",
 			component: User,
-			props: true,
+			props: (route) => {
+				return {
+					userName: route.params.userName,
+					// TODO: 多分ヘルパーある
+					after: getInt(route.query.after),
+					before: getInt(route.query.before),
+					page: getInt(route.query.page, 0),
+				};
+			},
 		},
 		{
 			path: "/:userName/:postId",
