@@ -11,6 +11,7 @@ export interface Owner {
 	displayName: string;
 	name: string;
 	created: Date;
+	postCount: number;
 }
 
 export interface StoreUser {
@@ -18,6 +19,7 @@ export interface StoreUser {
 	displayName: string;
 	created: firebase.firestore.Timestamp;
 	posts: firebase.firestore.CollectionReference;
+	postCount: number;
 }
 export interface RegisteredUser extends User {
 	name: string;

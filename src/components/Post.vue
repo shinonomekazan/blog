@@ -3,6 +3,7 @@
 		<h3>{{post.subject}}</h3>
 		<!-- マークダウンをサポートしたい -->
 		<div v-html="post.body"></div>
+		<div>{{post.created.toMillis()}}</div>
 	</div>
 </template>
 

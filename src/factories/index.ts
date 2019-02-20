@@ -7,6 +7,7 @@ export function createOwner(id: string, storeUser: models.StoreUser): models.Own
 		name: storeUser.name,
 		displayName: storeUser.displayName,
 		created: storeUser.created.toDate(),
+		postCount: storeUser.postCount,
 	};
 }
 
