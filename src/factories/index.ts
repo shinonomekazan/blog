@@ -37,7 +37,6 @@ export function createViewablePostByDocumentSnapshot(documentSnapshot: firebase.
 		body: data.body,
 		created: data.created,
 		updated: data.updated,
-		// TODO: なんだかんだで参照を持っておく方が便利だがメモリの無駄遣い感もあり、ベストプラクティスを調べたい
-		ref: documentSnapshot,
+		id: documentSnapshot.id,
 	};
 }

@@ -44,10 +44,15 @@ export default class User extends Vue {
 	@Prop({
 		required: true,
 		default: "desc",
-	}) order!: "asc" | "desc";	// 本当はorderは「両方」をサポートするとより良いかもしれにあ
-
-	pagingCount: number = 2;
-	showCount: number = 6;
+	}) order!: "asc" | "desc";	// 本当はorderは「両方」をサポートするとより良いかもしれない
+	@Prop({
+		type: Number,
+		default: 5,
+	}) pagingCount!: number;
+	@Prop({
+		type: Number,
+		default: 10,
+	}) showCount!: number;
 	posts: models.ViewablePost[] = [];
 	lastPost: models.ViewablePost | null = null;
 	firstPost: models.ViewablePost | null = null;
@@ -58,7 +63,6 @@ export default class User extends Vue {
 	sinceId: string | null = null;
 
 	async next() {
-		console.log("next");
 		try {
 			const posts = await this._getPosts(this.lastPost);
 			this.posts = this.posts.concat(posts);
@@ -69,7 +73,6 @@ export default class User extends Vue {
 	}
 
 	async prev() {
-		console.log("prev");
 		try {
 			const posts = await this._getPosts(this.firstPost, "asc");
 			// なんかださい（applyしたいけどそれだとvueが変更検知に失敗する）
@@ -87,7 +90,7 @@ export default class User extends Vue {
 		if (this.firstPost == null) {
 			return "?";
 		}
-		return `?since=${this.firstPost.ref.id}&order=asc`;
+		return `?since=${this.firstPost.id}&order=asc`;
 	}
 
 	// 使ってないがこのURLで栞的なものは作れる（それよりも文書中に栞を挟める方が便利だが）
@@ -95,7 +98,7 @@ export default class User extends Vue {
 		if (this.lastPost == null) {
 			return "?";
 		}
-		return `?since=${this.lastPost.ref.id}`;
+		return `?since=${this.lastPost.id}`;
 	}
 
 	async created() {
@@ -105,6 +108,10 @@ export default class User extends Vue {
 			this.sinceId = this.since;
 			const storeUser = await userRef.get();
 			this.posts = await this._getPostsByProps();
+			if (this.order === "asc") {
+				// これはほんとは常時reverseしてprev()メソッドのunshiftをやめるべきなのかも？
+				this.posts.reverse();
+			}
 			this.user = factories.createOwner(this.userName, storeUser.data() as models.StoreUser);
 			this._refreshLastFirst(this.posts, this.order);
 		} catch (err) {
@@ -119,11 +126,11 @@ export default class User extends Vue {
 			const postRef = firestore().collection("users").doc(this.userName).collection("posts");
 			let query = postRef.limit(this.pagingCount).orderBy("created", order);
 			if (startAfter != null) {
-				query = query.startAfter(startAfter.ref);
+				query = query.startAfter(startAfter.created);
 			}
 			try {
 				const querySnapshot = await query.get();
-				return this._createPosts(querySnapshot, this.order);
+				return this._createPosts(querySnapshot, order);
 			} catch (error) {
 				return Promise.reject(error);
 			}
@@ -138,9 +145,6 @@ export default class User extends Vue {
 			posts.push(factories.createViewablePostByDocumentSnapshot(postDocumentSnapshot));
 		});
 
-		if (order === "asc") {
-			return posts.reverse();
-		}
 		return posts;
 	}
 
@@ -162,10 +166,10 @@ export default class User extends Vue {
 			if (this.posts.length > this.showCount) {
 				if (order === "desc") {
 					this.posts = this.posts.slice(this.posts.length - this.showCount);
-					this.sinceId = this.posts[0].ref.id;
+					this.sinceId = this.posts[0].id;
 				} else {
 					this.posts = this.posts.slice(0, this.showCount - this.posts.length);
-					this.sinceId = this.posts[this.posts.length - 1].ref.id;
+					this.sinceId = this.posts[this.posts.length - 1].id;
 				}
 			}
 			this.lastPost = this.posts[this.posts.length - 1];

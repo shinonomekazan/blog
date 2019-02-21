@@ -1,6 +1,11 @@
 <template>
 	<div>
-		<a :href="postLink()">{{post.subject}}</a> (<a :href="userLink()">{{post.userDisplayName}}</a>)
+		<router-link :to="postLink()">
+			<a>{{post.subject}}</a>
+		</router-link>
+		(<router-link :to="userLink()">
+			<a>{{post.userDisplayName}}</a>
+		</router-link>)
 	</div>
 </template>
 

@@ -7,7 +7,7 @@ export interface Post {
 }
 
 export interface ViewablePost extends Post {
-	ref: firebase.firestore.DocumentSnapshot;
+	id: string;
 }
 
 export interface AllPost {
