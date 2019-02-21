@@ -4,14 +4,15 @@
 
 		<h2 v-if="user">{{user.displayName}}のブログ</h2>
 		<template>
-			<Post v-for="(post, index) in posts" :key="index" :post="post" :user="user" />
-			<div class="pager">
-				<template v-if="hasPrev()">
-					<a :href="prevLink()">前のページ</a>
+			<div class="prev_pager">
+				<template v-if="hasPrev">
+					<button @click="prev">新しい記事</button>
 				</template>
-				&nbsp;&nbsp;
-				<template v-if="hasNext()">
-					<a :href="nextLink()">次のページ</a>
+			</div>
+			<Post v-for="(post, index) in posts" :key="index" :post="post" :user="user" />
+			<div class="next_pager">
+				<template v-if="hasNext">
+					<button @click="next">前の記事</button>
 				</template>
 			</div>
 		</template>
@@ -23,6 +24,7 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import SignIn from "../components/SignIn.vue";
 import Post from "../components/Post.vue";
 import firebase from "firebase";
+import firestore = firebase.firestore;
 import * as models from "../models";
 import * as factories from "../factories";
 import {store} from "../store";
@@ -42,97 +44,157 @@ export default class User extends Vue {
 	@Prop({
 		required: true,
 		default: "desc",
-	}) order!: "asc" | "desc";
-	@Prop({
-		required: false,
-		default: 0,
-		type: Number,
-	}) page!: number;
+	}) order!: "asc" | "desc";	// 本当はorderは「両方」をサポートするとより良いかもしれにあ
 
 	pagingCount: number = 2;
-	posts: models.Post[] = [];
-	lastPost: models.Post | null = null;
-	firstPost: models.Post | null = null;
+	showCount: number = 6;
+	posts: models.ViewablePost[] = [];
+	lastPost: models.ViewablePost | null = null;
+	firstPost: models.ViewablePost | null = null;
+	hasPrev: boolean = false;
+	hasNext: boolean = false;
 	store = store;
 	user: models.Owner | null = null;
+	sinceId: string | null = null;
 
-	offset() {
-		return this.page * this.pagingCount;
+	async next() {
+		console.log("next");
+		try {
+			const posts = await this._getPosts(this.lastPost);
+			this.posts = this.posts.concat(posts);
+			this._refreshLastFirst(posts);
+		} catch (error) {
+			return Promise.reject(error);
+		}
 	}
 
+	async prev() {
+		console.log("prev");
+		try {
+			const posts = await this._getPosts(this.firstPost, "asc");
+			// なんかださい（applyしたいけどそれだとvueが変更検知に失敗する）
+			posts.forEach((post) => {
+				this.posts.unshift(post);
+			});
+			this._refreshLastFirst(posts, "asc");
+		} catch (error) {
+			return Promise.reject(error);
+		}
+	}
+
+	// 使ってないがこのURLで栞的なものは作れる（それよりも文書中に栞を挟める方が便利だが）
 	prevLink() {
-		if (this.firstPost == null) return "?";
-		if (this.page === 1) return "?";
-		return `?since=${this.firstPost.id!}&order=asc&page=${this.page - 1}`;
+		if (this.firstPost == null) {
+			return "?";
+		}
+		return `?since=${this.firstPost.ref.id}&order=asc`;
 	}
 
+	// 使ってないがこのURLで栞的なものは作れる（それよりも文書中に栞を挟める方が便利だが）
 	nextLink() {
-		if (this.lastPost == null) return "?";
-		return `?since=${this.lastPost.id!}&page=${this.page + 1}`;
-	}
-
-	hasPrev() {
-		return this.page > 0;
-	}
-
-	hasNext() {
-		if (this.user == null) return false;
-		console.log("hasNext: ",  this.offset(), this.pagingCount, this.user.postCount);
-		return (this.offset() + this.pagingCount) < this.user.postCount;
-	}
-
-	async createQuery(userRef: firebase.firestore.DocumentReference) {
-		const postRef = userRef.collection("posts");
-		const postQuery = postRef.limit(this.pagingCount);
-		async function orderWithSince(query: firebase.firestore.Query, order: firebase.firestore.OrderByDirection, since: string) {
-			const sinceDoc = await (postRef.doc(since)).get();
-			if (! sinceDoc.exists) return query.orderBy("created", order);
-			return query.orderBy("created", order).startAfter(sinceDoc);
+		if (this.lastPost == null) {
+			return "?";
 		}
-		if (this.order === "asc" && this.since != null) {
-			return orderWithSince(postQuery, "asc", this.since);
-		}
-		if (this.since != null) {
-			return orderWithSince(postQuery, "desc", this.since);
-		}
-		return postQuery.orderBy("created", "desc");
+		return `?since=${this.lastPost.ref.id}`;
 	}
 
 	async created() {
-		console.log("user created", this.userName, this.since, this.order, this.page);
-		const userRef = firebase.firestore().collection("users").doc(this.userName);
+		console.log("user created", this.userName, this.since, this.order);
+		const userRef = firestore().collection("users").doc(this.userName);
 		try {
+			this.sinceId = this.since;
 			const storeUser = await userRef.get();
-			const query = await this.createQuery(userRef);
-			const posts = await query.get();
+			this.posts = await this._getPostsByProps();
 			this.user = factories.createOwner(this.userName, storeUser.data() as models.StoreUser);
-			this.posts = [];
-			posts.forEach((post) => {
-				const data = post.data() as models.Post;
-				this.posts.push({
-					subject: data.subject,
-					body: data.body,
-					created: data.created,
-					updated: data.updated,
-					id: post.id,
-				});
-			});
-			if (this.order === "asc") {
-				this.posts = this.posts.reverse();
-			}
-			// TODO: ばっちい。
-			// if (this.before != null && this.page > 0) {
-			// 	this.posts = this.posts.reverse();
-			// }
-			if (this.posts.length > 0) {
-				this.lastPost = this.posts[this.posts.length - 1];
-				this.firstPost = this.posts[0];
-			} else {
-				this.lastPost = null;
-				this.firstPost = null;
-			}
+			this._refreshLastFirst(this.posts, this.order);
 		} catch (err) {
 			console.error("get data error", err);
+		}
+	}
+
+	async _getPosts(
+		startAfter: models.ViewablePost | null = null,
+		order: firestore.OrderByDirection = "desc") {
+		try {
+			const postRef = firestore().collection("users").doc(this.userName).collection("posts");
+			let query = postRef.limit(this.pagingCount).orderBy("created", order);
+			if (startAfter != null) {
+				query = query.startAfter(startAfter.ref);
+			}
+			try {
+				const querySnapshot = await query.get();
+				return this._createPosts(querySnapshot, this.order);
+			} catch (error) {
+				return Promise.reject(error);
+			}
+		} catch (error) {
+			return Promise.reject(error);
+		}
+	}
+
+	_createPosts(querySnapshot: firestore.QuerySnapshot, order: firestore.OrderByDirection = "desc") {
+		const posts: models.ViewablePost[] = [];
+		querySnapshot.forEach((postDocumentSnapshot) => {
+			posts.push(factories.createViewablePostByDocumentSnapshot(postDocumentSnapshot));
+		});
+
+		if (order === "asc") {
+			return posts.reverse();
+		}
+		return posts;
+	}
+
+	async _getPostsByProps() {
+		if (this.since != null ) {
+			const post = await this._getPost(this.since);
+			return await this._getPosts(
+				post,
+				this.order,
+			);
+		} else {
+			return this._getPosts();
+		}
+	}
+
+	_refreshLastFirst(newPosts: models.ViewablePost[], order: "desc" | "asc" = "desc") {
+		if (this.posts.length > 0) {
+			// 読み込みすぎの場合のカット処理
+			if (this.posts.length > this.showCount) {
+				if (order === "desc") {
+					this.posts = this.posts.slice(this.posts.length - this.showCount);
+					this.sinceId = this.posts[0].ref.id;
+				} else {
+					this.posts = this.posts.slice(0, this.showCount - this.posts.length);
+					this.sinceId = this.posts[this.posts.length - 1].ref.id;
+				}
+			}
+			this.lastPost = this.posts[this.posts.length - 1];
+			this.firstPost = this.posts[0];
+		} else {
+			this.lastPost = null;
+			this.firstPost = null;
+		}
+		// この次ページ/前ページ判定では最後まで読んだ時に一度無駄読み（0件であることを確認する読み込み）が発生する
+		// 防止する場合はpagingの1個先まで読むという手が考えられそう
+		if (order === "desc") {
+			this.hasNext = newPosts.length >= this.pagingCount;
+			this.hasPrev = this.sinceId != null;
+		} else {
+			this.hasPrev = newPosts.length >= this.pagingCount;
+			this.hasNext = this.sinceId != null;
+		}
+	}
+
+	async _getPost(id: string): Promise<models.ViewablePost | null> {
+		try {
+			const postDoc = firestore().collection("users").doc(this.userName).collection("posts").doc(id);
+			const documentSnapshot = await postDoc.get();
+			if (! documentSnapshot.exists) {
+				return null;
+			}
+			return factories.createViewablePostByDocumentSnapshot(documentSnapshot);
+		} catch (error) {
+			return Promise.reject(error);
 		}
 	}
 }

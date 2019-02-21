@@ -1,10 +1,13 @@
 import firebase from "firebase";
 export interface Post {
-	id?: string;
 	subject: string;
 	body: string;
 	created: firebase.firestore.Timestamp;
 	updated: firebase.firestore.Timestamp;
+}
+
+export interface ViewablePost extends Post {
+	ref: firebase.firestore.DocumentSnapshot;
 }
 
 export interface AllPost {
