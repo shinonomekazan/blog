@@ -1,5 +1,5 @@
 import firebase from "firebase";
-import * as models from "../models/User";
+import * as models from "../models";
 
 export function createOwner(id: string, storeUser: models.StoreUser): models.Owner {
 	return {
@@ -28,4 +28,16 @@ export function createUser(firebaseUser: firebase.User, storeUser?: models.Store
 		displayName: storeUser.displayName,
 		created: storeUser.created.toDate(),
 	} as models.RegisteredUser;
+}
+
+export function createViewablePostByDocumentSnapshot(documentSnapshot: firebase.firestore.DocumentSnapshot) {
+	const data = documentSnapshot.data() as models.Post;
+	return {
+		subject: data.subject,
+		body: data.body,
+		created: data.created,
+		updated: data.updated,
+		// TODO: なんだかんだで参照を持っておく方が便利だがメモリの無駄遣い感もあり、ベストプラクティスを調べたい
+		ref: documentSnapshot,
+	};
 }

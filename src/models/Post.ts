@@ -6,6 +6,10 @@ export interface Post {
 	updated: firebase.firestore.Timestamp;
 }
 
+export interface ViewablePost extends Post {
+	ref: firebase.firestore.DocumentSnapshot;
+}
+
 export interface AllPost {
 	subject: string;
 	body: string;

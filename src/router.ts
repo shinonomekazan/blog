@@ -8,9 +8,19 @@ import UserPost from "./views/UserPost.vue";
 Vue.use(Router);
 
 function getInt(param: string | string[] | null, defaultValue: null | number = null) {
-	if (param == null) return defaultValue;
-	if (typeof param === "string") return parseInt(param, 10);
+	if (param == null) {
+		return defaultValue;
+	}
+	if (typeof param === "string") {
+		return parseInt(param, 10);
+	}
 	return parseInt(param[0], 10);
+}
+function getOrder(param: string | string[] | null) {
+	if (param === "asc") {
+		return "asc";
+	}
+	return "desc";
 }
 
 export default new Router({
@@ -43,8 +53,8 @@ export default new Router({
 				return {
 					userName: route.params.userName,
 					// TODO: 多分ヘルパーある
-					after: getInt(route.query.after),
-					before: getInt(route.query.before),
+					since: route.query.since,
+					order: getOrder(route.query.order),
 					page: getInt(route.query.page, 0),
 				};
 			},
