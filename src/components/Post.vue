@@ -1,6 +1,6 @@
 <template id="post">
 	<div class="post">
-		<h3><router-link :to="postLink()">{{post.subject}}</router-link></h3>
+		<h2><router-link :to="{name: 'userPost', params: {userName: user.name, postId: post.id}}">{{post.subject}}</router-link></h2>
 		<div v-html="body()"></div>
 		<div>{{date()}}</div>
 	</div>
@@ -28,14 +28,6 @@ export default class Post extends Vue {
 	date() {
 		const d = this.post.created.toDate();
 		return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${d.getHours()}時${d.getMinutes()}分`;
-	}
-
-	postLink() {
-		return `${this.userLink()}/${this.post.id}`;
-	}
-
-	userLink() {
-		return `/${this.user.name}`;
 	}
 }
 </script>

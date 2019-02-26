@@ -2,16 +2,13 @@
 	<div id="home">
 		<SignIn :user="store.user" />
 
-		<h2 v-if="user"><router-link :to="userLink()">{{user.displayName}}のブログ</router-link></h2>
+		<h1 v-if="user">
+			<router-link :to="{name: 'user', params: {userName: userName, postId: postId}}">
+				{{user.displayName}}の投稿
+			</router-link>
+		</h1>
 		<Post v-if="post" :user="user" :post="post" />
-		<template>
-			<h3 v-if="relativePosts.length > 0">他の記事</h3>
-			<ul>
-				<li v-for="(relativePost, index) in relativePosts" :key="index">
-					<router-link :to="postLink(relativePost)">{{relativePost.subject}}</router-link>
-				</li>
-			</ul>
-		</template>
+		<RelativePost :post="post" :userName="userName" />
 	</div>
 </template>
 
@@ -19,6 +16,7 @@
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import SignIn from "../components/SignIn.vue";
 import Post from "../components/Post.vue";
+import RelativePost from "../components/RelativePost.vue";
 import firebase from "firebase";
 import firestore = firebase.firestore;
 import * as models from "../models";
@@ -29,12 +27,13 @@ import {store} from "../store";
 	components: {
 		SignIn,
 		Post,
+		RelativePost,
 	},
 })
 export default class User extends Vue {
 	@Prop() userName!: string;
 	@Prop() postId!: string;
-	post: models.Post | null = null;
+	post: models.ViewablePost | null = null;
 	relativePosts: models.ViewablePost[] = [];
 	store = store;
 	user: models.Owner | null = null;
@@ -77,17 +76,6 @@ export default class User extends Vue {
 		const storeUser = await userRef.get();
 		this.user = factories.createOwner(this.userName, storeUser.data() as models.StoreUser);
 		return this.onPostIdChanged();
-	}
-
-	postLink(post: models.ViewablePost) {
-		return `${this.userLink()}/${post.id}`;
-	}
-
-	userLink() {
-		if (this.user == null) {
-			return "";
-		}
-		return `/${this.user.name}`;
 	}
 }
 </script>
