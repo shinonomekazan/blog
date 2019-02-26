@@ -61,7 +61,7 @@ export default new Router({
 		},
 		{
 			path: "/:userName/:postId",
-			name: "user",
+			name: "userPost",
 			component: UserPost,
 			props: true,
 		},

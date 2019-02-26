@@ -1,8 +1,8 @@
 <template>
-	<div id="home">
+	<div id="user">
 		<SignIn :user="store.user" />
 
-		<h2 v-if="user">{{user.displayName}}のブログ</h2>
+		<h1 v-if="user">{{user.displayName}}の投稿</h1>
 		<template>
 			<div class="prev_pager">
 				<template v-if="hasPrev">
