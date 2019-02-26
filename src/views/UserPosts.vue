@@ -62,6 +62,22 @@ export default class UserPosts extends Vue {
 	user: models.Owner | null = null;
 	sinceId: string | null = null;
 
+	// 使ってないがこのURLで栞的なものは作れる（それよりも文書中に栞を挟める方が便利だが）
+	get prevLink() {
+		if (this.firstPost == null) {
+			return "?";
+		}
+		return `?since=${this.firstPost.id}&order=asc`;
+	}
+
+	// 使ってないがこのURLで栞的なものは作れる（それよりも文書中に栞を挟める方が便利だが）
+	get nextLink() {
+		if (this.lastPost == null) {
+			return "?";
+		}
+		return `?since=${this.lastPost.id}`;
+	}
+
 	async next() {
 		try {
 			const posts = await this.$_UserPosts_getPosts(this.lastPost);
@@ -83,22 +99,6 @@ export default class UserPosts extends Vue {
 		} catch (error) {
 			return Promise.reject(error);
 		}
-	}
-
-	// 使ってないがこのURLで栞的なものは作れる（それよりも文書中に栞を挟める方が便利だが）
-	prevLink() {
-		if (this.firstPost == null) {
-			return "?";
-		}
-		return `?since=${this.firstPost.id}&order=asc`;
-	}
-
-	// 使ってないがこのURLで栞的なものは作れる（それよりも文書中に栞を挟める方が便利だが）
-	nextLink() {
-		if (this.lastPost == null) {
-			return "?";
-		}
-		return `?since=${this.lastPost.id}`;
 	}
 
 	async created() {
