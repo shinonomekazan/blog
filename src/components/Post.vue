@@ -1,29 +1,25 @@
 <template id="post">
 	<div class="post">
 		<h2><router-link :to="{name: 'userPost', params: {userName: user.name, postId: post.id}}">{{post.subject}}</router-link></h2>
-		<div v-html="body()"></div>
+		<Preview :body="post.body" />
 		<div>{{date()}}</div>
 	</div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import Preview from "./Preview.vue";
 import * as models from "../models";
-import markdownIt from "markdown-it";
+import * as utils from "../utils"
 
-const md = markdownIt({
-	html: true,
-	linkify: true,
-});
-
-@Component({})
+@Component({
+	components: {
+		Preview,
+	},
+})
 export default class Post extends Vue {
 	@Prop() user!: models.Owner;
 	@Prop() post!: models.ViewablePost;
-
-	body() {
-		return md.render(this.post.body);
-	}
 
 	date() {
 		const d = this.post.created.toDate();
