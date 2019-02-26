@@ -9,18 +9,25 @@
 			<div>
 				<textarea v-model="body" placeholder="本文" aria-label="ブログの本文"></textarea>
 			</div>
+			<Preview :body="body" />
 		</div>
 		<input type="submit">
 	</form>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import Preview from "../components/Preview.vue";
 import firebase from "firebase";
 import * as models from "../models";
 import * as factories from "../factories";
 import {store} from "../store";
+import * as utils from "../utils";
 
-@Component({})
+@Component({
+	components: {
+		Preview,
+	},
+})
 export default class PostForm extends Vue {
 	store = store;
 	// @Prop() user!: models.User;
