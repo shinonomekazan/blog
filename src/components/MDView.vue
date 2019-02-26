@@ -4,10 +4,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import * as utils from "../utils"
+import * as utils from "../utils";
 
 @Component({})
-export default class Preview extends Vue {
+export default class MDView extends Vue {
 	@Prop() body!: string;
 
 	preview() {

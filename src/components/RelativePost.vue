@@ -28,7 +28,7 @@ export default class RelativePost extends Vue {
 	relativePosts: models.ViewablePost[] = [];
 
 	@Watch("post")
-	async onPostChanged() {
+	async $_RelativePost_onPostChanged() {
 		this.relativePosts = [];
 		const postRef = firestore().collection("users").doc(this.userName).collection("posts");
 		try {

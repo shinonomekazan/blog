@@ -1,8 +1,8 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Home from "./views/Home.vue";
+import TopPage from "./views/TopPage.vue";
 import PostForm from "./views/PostForm.vue";
-import User from "./views/User.vue";
+import UserPosts from "./views/UserPosts.vue";
 import UserPost from "./views/UserPost.vue";
 
 Vue.use(Router);
@@ -30,7 +30,7 @@ export default new Router({
 		{
 			path: "/",
 			name: "home",
-			component: Home,
+			component: TopPage,
 		},
 		{
 			path: "/about",
@@ -38,7 +38,7 @@ export default new Router({
 			// route level code-splitting
 			// this generates a separate chunk (about.[hash].js) for this route
 			// which is lazy-loaded when the route is visited.
-			component: () => import(/* webpackChunkName: "about" */ "./views/About.vue"),
+			component: () => import(/* webpackChunkName: "about" */ "./views/AboutThis.vue"),
 		},
 		{
 			path: "/_do_post",
@@ -48,7 +48,7 @@ export default new Router({
 		{
 			path: "/:userName",
 			name: "user",
-			component: User,
+			component: UserPosts,
 			props: (route) => {
 				return {
 					userName: route.params.userName,
