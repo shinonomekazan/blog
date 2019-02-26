@@ -22,7 +22,7 @@ import {store} from "./store";
 
 @Component({
 	components: {
-			SignIn,
+		SignIn,
 	},
 })
 export default class App extends Vue {
