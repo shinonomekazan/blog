@@ -7,7 +7,7 @@
 				{{user.displayName}}の投稿
 			</router-link>
 		</h1>
-		<Post v-if="post" :user="user" :post="post" />
+		<PostView v-if="post" :user="user" :post="post" />
 		<RelativePost :post="post" :userName="userName" />
 	</div>
 </template>
@@ -15,7 +15,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import SignIn from "../components/SignIn.vue";
-import Post from "../components/Post.vue";
+import PostView from "../components/PostView.vue";
 import RelativePost from "../components/RelativePost.vue";
 import firebase from "firebase";
 import firestore = firebase.firestore;
@@ -26,11 +26,11 @@ import {store} from "../store";
 @Component({
 	components: {
 		SignIn,
-		Post,
+		PostView,
 		RelativePost,
 	},
 })
-export default class User extends Vue {
+export default class UserPost extends Vue {
 	@Prop() userName!: string;
 	@Prop() postId!: string;
 	post: models.ViewablePost | null = null;
@@ -39,7 +39,7 @@ export default class User extends Vue {
 	user: models.Owner | null = null;
 
 	@Watch("postId")
-	async onPostIdChanged() {
+	async $_UserPost_onPostIdChanged() {
 		const userRef = firestore().collection("users").doc(this.userName);
 		this.relativePosts = [];
 		try {
@@ -75,7 +75,7 @@ export default class User extends Vue {
 		const userRef = firestore().collection("users").doc(this.userName);
 		const storeUser = await userRef.get();
 		this.user = factories.createOwner(this.userName, storeUser.data() as models.StoreUser);
-		return this.onPostIdChanged();
+		return this.$_UserPost_onPostIdChanged();
 	}
 }
 </script>

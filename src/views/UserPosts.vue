@@ -9,7 +9,7 @@
 					<button @click="prev">新しい記事</button>
 				</template>
 			</div>
-			<Post v-for="(post, index) in posts" :key="index" :post="post" :user="user" />
+			<PostView v-for="(post, index) in posts" :key="index" :post="post" :user="user" />
 			<div class="next_pager">
 				<template v-if="hasNext">
 					<button @click="next">前の記事</button>
@@ -22,7 +22,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import SignIn from "../components/SignIn.vue";
-import Post from "../components/Post.vue";
+import PostView from "../components/PostView.vue";
 import firebase from "firebase";
 import firestore = firebase.firestore;
 import * as models from "../models";
@@ -32,10 +32,10 @@ import {store} from "../store";
 @Component({
 	components: {
 		SignIn,
-		Post,
+		PostView,
 	},
 })
-export default class User extends Vue {
+export default class UserPosts extends Vue {
 	@Prop() userName!: string;
 	@Prop({
 		required: false,
@@ -64,9 +64,9 @@ export default class User extends Vue {
 
 	async next() {
 		try {
-			const posts = await this._getPosts(this.lastPost);
+			const posts = await this.$_UserPosts_getPosts(this.lastPost);
 			this.posts = this.posts.concat(posts);
-			this._refreshLastFirst(posts);
+			this.$_UserPosts_refreshLastFirst(posts);
 		} catch (error) {
 			return Promise.reject(error);
 		}
@@ -74,12 +74,12 @@ export default class User extends Vue {
 
 	async prev() {
 		try {
-			const posts = await this._getPosts(this.firstPost, "asc");
+			const posts = await this.$_UserPosts_getPosts(this.firstPost, "asc");
 			// なんかださい（applyしたいけどそれだとvueが変更検知に失敗する）
 			posts.forEach((post) => {
 				this.posts.unshift(post);
 			});
-			this._refreshLastFirst(posts, "asc");
+			this.$_UserPosts_refreshLastFirst(posts, "asc");
 		} catch (error) {
 			return Promise.reject(error);
 		}
@@ -107,19 +107,19 @@ export default class User extends Vue {
 		try {
 			this.sinceId = this.since;
 			const storeUser = await userRef.get();
-			this.posts = await this._getPostsByProps();
+			this.posts = await this.$_UserPosts_getPostsByProps();
 			if (this.order === "asc") {
 				// これはほんとは常時reverseしてprev()メソッドのunshiftをやめるべきなのかも？
 				this.posts.reverse();
 			}
 			this.user = factories.createOwner(this.userName, storeUser.data() as models.StoreUser);
-			this._refreshLastFirst(this.posts, this.order);
+			this.$_UserPosts_refreshLastFirst(this.posts, this.order);
 		} catch (err) {
 			console.error("get data error", err);
 		}
 	}
 
-	async _getPosts(
+	async $_UserPosts_getPosts(
 		startAfter: models.ViewablePost | null = null,
 		order: firestore.OrderByDirection = "desc") {
 		try {
@@ -130,7 +130,7 @@ export default class User extends Vue {
 			}
 			try {
 				const querySnapshot = await query.get();
-				return this._createPosts(querySnapshot, order);
+				return this.$_UserPosts_createPosts(querySnapshot, order);
 			} catch (error) {
 				return Promise.reject(error);
 			}
@@ -139,7 +139,7 @@ export default class User extends Vue {
 		}
 	}
 
-	_createPosts(querySnapshot: firestore.QuerySnapshot, order: firestore.OrderByDirection = "desc") {
+	$_UserPosts_createPosts(querySnapshot: firestore.QuerySnapshot, order: firestore.OrderByDirection = "desc") {
 		const posts: models.ViewablePost[] = [];
 		querySnapshot.forEach((postDocumentSnapshot) => {
 			posts.push(factories.createViewablePostByDocumentSnapshot(postDocumentSnapshot));
@@ -148,19 +148,19 @@ export default class User extends Vue {
 		return posts;
 	}
 
-	async _getPostsByProps() {
+	async $_UserPosts_getPostsByProps() {
 		if (this.since != null ) {
-			const post = await this._getPost(this.since);
-			return await this._getPosts(
+			const post = await this.$_UserPosts_getPost(this.since);
+			return await this.$_UserPosts_getPosts(
 				post,
 				this.order,
 			);
 		} else {
-			return this._getPosts();
+			return this.$_UserPosts_getPosts();
 		}
 	}
 
-	_refreshLastFirst(newPosts: models.ViewablePost[], order: "desc" | "asc" = "desc") {
+	$_UserPosts_refreshLastFirst(newPosts: models.ViewablePost[], order: "desc" | "asc" = "desc") {
 		if (this.posts.length > 0) {
 			// 読み込みすぎの場合のカット処理
 			if (this.posts.length > this.showCount) {
@@ -189,7 +189,7 @@ export default class User extends Vue {
 		}
 	}
 
-	async _getPost(id: string): Promise<models.ViewablePost | null> {
+	async $_UserPosts_getPost(id: string): Promise<models.ViewablePost | null> {
 		try {
 			const postDoc = firestore().collection("users").doc(this.userName).collection("posts").doc(id);
 			const documentSnapshot = await postDoc.get();
