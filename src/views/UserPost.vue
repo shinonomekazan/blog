@@ -38,6 +38,14 @@ export default class UserPost extends Vue {
 	store = store;
 	user: models.Owner | null = null;
 
+	async created() {
+		console.log("user post created", this.userName, this.postId);
+		const userRef = firestore().collection("users").doc(this.userName);
+		const storeUser = await userRef.get();
+		this.user = factories.createOwner(this.userName, storeUser.data() as models.StoreUser);
+		return this.$_UserPost_onPostIdChanged();
+	}
+
 	@Watch("postId")
 	async $_UserPost_onPostIdChanged() {
 		const userRef = firestore().collection("users").doc(this.userName);
@@ -68,14 +76,6 @@ export default class UserPost extends Vue {
 		} catch (err) {
 			console.error("get data error", err);
 		}
-	}
-
-	async created() {
-		console.log("user post created", this.userName, this.postId);
-		const userRef = firestore().collection("users").doc(this.userName);
-		const storeUser = await userRef.get();
-		this.user = factories.createOwner(this.userName, storeUser.data() as models.StoreUser);
-		return this.$_UserPost_onPostIdChanged();
 	}
 }
 </script>

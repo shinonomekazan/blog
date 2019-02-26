@@ -9,14 +9,14 @@
 			<div>
 				<textarea v-model="body" placeholder="本文" aria-label="ブログの本文"></textarea>
 			</div>
-			<MDView :body="body" />
+			<MarkdownView :body="body" />
 		</div>
 		<input type="submit">
 	</form>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import MDView from "../components/MDView.vue";
+import MarkdownView from "../components/MarkdownView.vue";
 import firebase from "firebase";
 import * as models from "../models";
 import * as factories from "../factories";
@@ -25,7 +25,7 @@ import * as utils from "../utils";
 
 @Component({
 	components: {
-		MDView,
+		MarkdownView,
 	},
 })
 export default class PostForm extends Vue {
