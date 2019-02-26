@@ -4,6 +4,7 @@ import TopPage from "./views/TopPage.vue";
 import PostForm from "./views/PostForm.vue";
 import UserPosts from "./views/UserPosts.vue";
 import UserPost from "./views/UserPost.vue";
+import {store} from "./store";
 
 Vue.use(Router);
 
@@ -44,6 +45,11 @@ export default new Router({
 			path: "/_do_post",
 			name: "post",
 			component: PostForm,
+			props: (route) => {
+				return {
+					owner: store.user,
+				};
+			},
 		},
 		{
 			path: "/:userName",

@@ -20,7 +20,6 @@ import MarkdownView from "../components/MarkdownView.vue";
 import firebase from "firebase";
 import * as models from "../models";
 import * as factories from "../factories";
-import {store} from "../store";
 import * as utils from "../utils";
 
 @Component({
@@ -29,7 +28,7 @@ import * as utils from "../utils";
 	},
 })
 export default class PostForm extends Vue {
-	store = store;
+	@Prop() owner!: models.RegisteredUser;
 	subject: string = "";
 	body: string = "";
 	msg: string = "";
@@ -37,11 +36,10 @@ export default class PostForm extends Vue {
 	async post() {
 		console.log("posted");
 		// TODO: validate
-		if (this.store.user == null || !this.store.user.registered) {
+		if (this.owner == null || !this.owner.registered) {
 			this.msg = "ログインしてください。";
 			return;
 		}
-		const registeredUser = this.store.user as models.RegisteredUser;
 		const post = {
 			subject: this.subject,
 			body: this.body,
@@ -50,7 +48,7 @@ export default class PostForm extends Vue {
 		} as models.Post;
 		console.log(post);
 		try {
-			await firebase.firestore().collection("users").doc(registeredUser.name).collection("posts").add(post);
+			await firebase.firestore().collection("users").doc(this.owner.name).collection("posts").add(post);
 			this.$_postForm_clear();
 			this.msg = "投稿しました。";
 		} catch (err) {
