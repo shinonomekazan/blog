@@ -1,7 +1,5 @@
 <template>
 	<div id="user">
-		<SignIn :user="store.user" />
-
 		<h1 v-if="user">{{user.displayName}}の投稿</h1>
 		<template>
 			<div class="prev_pager">
@@ -21,7 +19,6 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import SignIn from "../components/SignIn.vue";
 import PostView from "../components/PostView.vue";
 import firebase from "firebase";
 import firestore = firebase.firestore;
@@ -31,7 +28,6 @@ import {store} from "../store";
 
 @Component({
 	components: {
-		SignIn,
 		PostView,
 	},
 })
@@ -58,7 +54,6 @@ export default class UserPosts extends Vue {
 	firstPost: models.ViewablePost | null = null;
 	hasPrev: boolean = false;
 	hasNext: boolean = false;
-	store = store;
 	user: models.Owner | null = null;
 	sinceId: string | null = null;
 

@@ -1,7 +1,5 @@
 <template>
 	<div id="home">
-		<SignIn :user="store.user" />
-
 		<h1 v-if="user">
 			<router-link :to="{name: 'user', params: {userName: userName, postId: postId}}">
 				{{user.displayName}}の投稿
@@ -14,18 +12,15 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import SignIn from "../components/SignIn.vue";
 import PostView from "../components/PostView.vue";
 import RelativePost from "../components/RelativePost.vue";
 import firebase from "firebase";
 import firestore = firebase.firestore;
 import * as models from "../models";
 import * as factories from "../factories";
-import {store} from "../store";
 
 @Component({
 	components: {
-		SignIn,
 		PostView,
 		RelativePost,
 	},
@@ -35,7 +30,6 @@ export default class UserPost extends Vue {
 	@Prop() postId!: string;
 	post: models.ViewablePost | null = null;
 	relativePosts: models.ViewablePost[] = [];
-	store = store;
 	user: models.Owner | null = null;
 
 	async created() {

@@ -2,21 +2,33 @@
 	<div id="app">
 		<div id="nav">
 			<router-link to="/">TOP</router-link> |
-			<router-link to="/_do_post">記事を書く</router-link> |
+			<template v-if="store.user">
+				<router-link to="/_do_post">記事を書く</router-link> |
+			</template>
 			<router-link to="/about">このサイト</router-link>
+			<span style="margin-right: 1ex"></span>
+			<SignIn :user="store.user" />
 		</div>
 		<router-view/>
 	</div>
 </template>
 
-<!--
 <script lang="ts">
-import { Vue } from "vue-property-decorator";
+import { Vue, Component } from "vue-property-decorator";
+import SignIn from "./components/SignIn.vue";
+import {store} from "./store";
+
 // TODO: ここに認証コードを書いて、/postの表示非表示切り替え
+@Component({
+	components: {
+		SignIn,
+	},
+})
 export default class App extends Vue {
+	store = store;
 }
 </script>
--->
+
 <style>
 #app {
 	font-family: 'Avenir', Helvetica, Arial, sans-serif;

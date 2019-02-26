@@ -1,5 +1,5 @@
 <template>
-	<div class="signin">
+	<div style="display: inline">
 		<template v-if="user">
 			ようこそ <span>{{user.displayName}}</span> さん
 			<a @click="signOut" class="button--green">signOut</a>
