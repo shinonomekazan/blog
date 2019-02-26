@@ -1,6 +1,6 @@
 <template>
-	<div id="app">
-		<div id="nav">
+	<v-app>
+		<v-toolbar app>
 			<router-link to="/">TOP</router-link> |
 			<template v-if="store.user">
 				<router-link to="/_do_post">記事を書く</router-link> |
@@ -8,9 +8,11 @@
 			<router-link to="/about">このサイト</router-link>
 			<span style="margin-right: 1ex"></span>
 			<SignIn :user="store.user" />
-		</div>
-		<router-view/>
-	</div>
+		</v-toolbar>
+		<v-content>
+			<router-view/>
+		</v-content>
+	</v-app>
 </template>
 
 <script lang="ts">
@@ -18,34 +20,12 @@ import { Vue, Component } from "vue-property-decorator";
 import SignIn from "./components/SignIn.vue";
 import {store} from "./store";
 
-// TODO: ここに認証コードを書いて、/postの表示非表示切り替え
 @Component({
 	components: {
-		SignIn,
+			SignIn,
 	},
 })
 export default class App extends Vue {
 	store = store;
 }
 </script>
-
-<style>
-#app {
-	font-family: 'Avenir', Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	color: #2c3e50;
-}
-#nav {
-	padding: 30px;
-}
-
-#nav a {
-	font-weight: bold;
-	color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-	color: #42b983;
-}
-</style>
