@@ -1,7 +1,5 @@
 <template>
 	<div id="home">
-		<SignIn :user="store.user" />
-
 		<ul class="toppost">
 			<li v-for="(post, index) in posts" :key="index">
 				<TopPost :post="post" />
@@ -12,23 +10,19 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import SignIn from "../components/SignIn.vue";
 import TopPost from "../components/TopPost.vue";
 import firebase from "firebase";
 import * as models from "../models";
 import * as factories from "../factories";
-import {store} from "../store";
 
 @Component({
 	components: {
-		SignIn,
 		TopPost,
 	},
 })
 export default class TopPage extends Vue {
 	postRef: firebase.firestore.CollectionReference | null = null;
 	posts: models.AllPost[] = [];
-	store = store;
 
 	async created() {
 		console.log("home created");
