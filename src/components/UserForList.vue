@@ -17,7 +17,6 @@
 					<v-list-tile-title>
 						SignOut
 					</v-list-tile-title>
-					<RegisterUser v-if="!user.registered" :user="user" />
 				</v-list-tile-content>
 			</v-list-tile>
 			<v-list-tile @click="signIn" v-else>
@@ -36,13 +35,8 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import firebase from "firebase";
 import * as models from "../models";
-import RegisterUser from "./RegisterUser.vue";
 
-@Component({
-	components: {
-		RegisterUser,
-	},
-})
+@Component({})
 export default class UserForList extends Vue {
 	@Prop() user!: models.User;
 

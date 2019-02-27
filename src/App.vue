@@ -1,5 +1,6 @@
 <template>
 	<v-app>
+		<RegisterUser :user="store.user" />
 		<v-navigation-drawer hide-overlay fixed v-model="drawer">
 			<v-list>
 				<v-list-tile to="/">
@@ -69,11 +70,13 @@ import { Vue, Component } from "vue-property-decorator";
 import UserForList from "./components/UserForList.vue";
 import UserForToolbar from "./components/UserForToolbar.vue";
 import {store} from "./store";
+import RegisterUser from "./components/RegisterUser.vue";
 
 @Component({
 	components: {
 		UserForList,
 		UserForToolbar,
+		RegisterUser,
 	},
 })
 export default class App extends Vue {
