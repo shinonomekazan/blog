@@ -2,7 +2,7 @@
 	<v-app>
 		<v-navigation-drawer hide-overlay fixed v-model="drawer">
 			<v-list>
-				<v-list-tile v-if="store.user" to="/">
+				<v-list-tile to="/">
 					<v-list-tile-action>
 						<v-icon>home</v-icon>
 					</v-list-tile-action>
