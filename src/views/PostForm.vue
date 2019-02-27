@@ -1,18 +1,33 @@
 <template>
-	<form id="post" @submit.prevent="post">
+	<v-form id="postForm" @submit.prevent="post" ref="postForm" lazy-validation>
 		<div v-show="msg">{{msg}}</div>
 		<div>
-			タイトル: <input type="text" v-model="subject" placeholder="タイトル" aria-label="ブログの記事タイトル">
+			<v-text-field
+				v-model="subject"
+				placeholder="タイトル"
+				aria-label="ブログの記事タイトル"
+				required
+				label="タイトル"
+				:rules="titleRule"
+			/>
 		</div>
 		<div>
-			<div>本文:</div>
 			<div>
-				<textarea v-model="body" placeholder="本文" aria-label="ブログの本文"></textarea>
+				<!-- auto-growする方がいいのかもしれない -->
+				<v-textarea
+					v-model="body"
+					placeholder="本文"
+					aria-label="ブログの本文"
+					required
+					label="本文"
+					:rules="bodyRule"
+					rows="16"
+				></v-textarea>
 			</div>
 			<MarkdownView :body="body" />
 		</div>
-		<input type="submit">
-	</form>
+		<v-btn color="success" @click="post">投稿</v-btn>
+	</v-form>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
@@ -33,9 +48,24 @@ export default class PostForm extends Vue {
 	body: string = "";
 	msg: string = "";
 
+	get titleRule() {
+		return [
+			(v: string) => v.length === 0 ? "タイトルを入力してください" : true,
+		];
+	}
+
+	get bodyRule() {
+		return [
+			(v: string) => v.length === 0 ? "本文を入力してください" : true,
+		];
+	}
+
 	async post() {
 		console.log("posted");
-		// TODO: validate
+		console.log("validate?", (this.$refs.postForm as HTMLFormElement).validate());
+		if (! (this.$refs.postForm as HTMLFormElement).validate()) {
+			return;
+		}
 		if (this.owner == null || !this.owner.registered) {
 			this.msg = "ログインしてください。";
 			return;
