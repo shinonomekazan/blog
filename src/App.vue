@@ -8,7 +8,7 @@
 					</v-list-tile-action>
 					<v-list-tile-content>
 						<v-list-tile-title>
-							HOME
+							ブログシステム
 						</v-list-tile-title>
 					</v-list-tile-content>
 				</v-list-tile>
@@ -41,7 +41,7 @@
 			<v-toolbar-side-icon @click="drawer = !drawer" />
 			<v-toolbar-title>
 				<router-link to="/">
-					BLOG
+					ブログシステム
 				</router-link>
 			</v-toolbar-title>
 			<v-spacer />

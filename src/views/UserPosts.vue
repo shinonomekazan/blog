@@ -4,13 +4,13 @@
 		<template>
 			<div class="prev_pager">
 				<template v-if="hasPrev">
-					<button @click="prev">新しい記事</button>
+					<v-btn color="info" @click="prev">新しい記事</v-btn>
 				</template>
 			</div>
-			<PostView v-for="(post, index) in posts" :key="index" :post="post" :user="user" />
+			<PostView v-for="(post, index) in posts" :key="index" :post="post" :user="user" class="mb-4" />
 			<div class="next_pager">
 				<template v-if="hasNext">
-					<button @click="next">前の記事</button>
+					<v-btn color="info" @click="next">前の記事</v-btn>
 				</template>
 			</div>
 		</template>

@@ -1,23 +1,23 @@
 <template>
 	<div id="home">
-		<ul class="toppost">
-			<li v-for="(post, index) in posts" :key="index">
-				<TopPost :post="post" />
-			</li>
-		</ul>
+		<v-list two-line>
+			<template  v-for="(post, index) in posts">
+				<TopPostTitle :post="post" :key="index" />
+			</template>
+		</v-list>
 	</div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import TopPost from "../components/TopPost.vue";
+import TopPostTitle from "../components/TopPostTitle.vue";
 import firebase from "firebase";
 import * as models from "../models";
 import * as factories from "../factories";
 
 @Component({
 	components: {
-		TopPost,
+		TopPostTitle,
 	},
 })
 export default class TopPage extends Vue {

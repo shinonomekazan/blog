@@ -1,31 +1,34 @@
 <template>
 	<v-form id="postForm" @submit.prevent="post" ref="postForm" lazy-validation>
 		<div v-show="msg">{{msg}}</div>
-		<div>
-			<v-text-field
-				v-model="subject"
-				placeholder="タイトル"
-				aria-label="ブログの記事タイトル"
-				required
-				label="タイトル"
-				:rules="titleRule"
-			/>
-		</div>
-		<div>
-			<div>
-				<!-- auto-growする方がいいのかもしれない -->
+		<v-layout row wrap>
+			<v-flex xs12 md12>
+				<v-text-field
+					v-model="subject"
+					placeholder="タイトル"
+					aria-label="ブログの記事タイトル"
+					required
+					label="タイトル"
+					:rules="titleRule"
+				/>
+			</v-flex>
+			<!-- TODO: ほんとはauto-growやめてMarkdownViewもtextareaと同じ高さに自動調整したい -->
+			<v-flex xs12 sm12 md6>
 				<v-textarea
 					v-model="body"
 					placeholder="本文"
 					aria-label="ブログの本文"
 					required
+					auto-grow
 					label="本文"
 					:rules="bodyRule"
 					rows="16"
 				></v-textarea>
-			</div>
-			<MarkdownView :body="body" />
-		</div>
+			</v-flex>
+			<v-flex xs12 sm12 md6>
+				<MarkdownView :body="body" />
+			</v-flex>
+		</v-layout>
 		<v-btn color="success" @click="post">投稿</v-btn>
 	</v-form>
 </template>
@@ -90,6 +93,8 @@ export default class PostForm extends Vue {
 	$_postForm_clear() {
 		this.subject = "";
 		this.body = "";
+		// TODO: VFormを型解決しないと無理だけど現状型解決できないっぽい
+		(this.$refs.postForm as any).resetValidation();
 	}
 }
 </script>

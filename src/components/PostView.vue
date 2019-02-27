@@ -1,9 +1,24 @@
 <template id="post">
-	<div class="post">
-		<h2><router-link :to="{name: 'userPost', params: {userName: user.name, postId: post.id}}">{{post.subject}}</router-link></h2>
-		<MarkdownView :body="post.body" />
-		<div>{{$_PostView_date}}</div>
-	</div>
+	<v-card>
+		<v-card-title>
+			<h1>
+				<router-link :to="{name: 'userPost', params: {userName: user.name, postId: post.id}}">
+					{{post.subject}}
+				</router-link>
+			</h1>
+		</v-card-title>
+		<v-divider />
+		<v-card-text>
+			<MarkdownView :body="post.body" />
+		</v-card-text>
+		<v-divider />
+		<v-card-text>
+			<router-link :to="{name: 'user', params: {userName: user.name}}">
+				{{user.displayName}}
+			</router-link>
+			<span> - {{date}}</span>
+		</v-card-text>
+	</v-card>
 </template>
 
 <script lang="ts">
@@ -21,9 +36,8 @@ export default class PostView extends Vue {
 	@Prop() user!: models.Owner;
 	@Prop() post!: models.ViewablePost;
 
-	get $_PostView_date() {
-		const d = this.post.created.toDate();
-		return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${d.getHours()}時${d.getMinutes()}分`;
+	get date() {
+		return utils.fromTimestampToDate(this.post.created);
 	}
 }
 </script>

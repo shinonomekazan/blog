@@ -1,10 +1,5 @@
 <template>
 	<div id="home">
-		<h1 v-if="user">
-			<router-link :to="{name: 'user', params: {userName: userName, postId: postId}}">
-				{{user.displayName}}の投稿
-			</router-link>
-		</h1>
 		<PostView v-if="post" :user="user" :post="post" />
 		<RelativePost :post="post" :userName="userName" />
 	</div>
