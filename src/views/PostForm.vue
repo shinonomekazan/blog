@@ -12,6 +12,17 @@
 					:rules="titleRule"
 				/>
 			</v-flex>
+			<v-flex xs12 md12>
+				<v-layout>
+					<v-flex xs12 sm3 md3>
+						<v-btn color="success" @click="$refs.inputUpload.click()">画像を追加</v-btn>
+						<input v-show="false" ref="inputUpload" type="file" @change="uploadFile" multiple="false" >
+					</v-flex>
+					<v-flex xs12 sm9 md9>
+						<v-text-field v-model="imageUrl" label="画像のURL" placeholder="アップロードされた画像のURLが入ります" @click="copyUrl" ref="url" :readonly="true" />
+					</v-flex>
+				</v-layout>
+			</v-flex>
 			<!-- TODO: ほんとはauto-growやめてMarkdownViewもtextareaと同じ高さに自動調整したい -->
 			<v-flex xs12 sm12 md6>
 				<v-textarea
@@ -23,13 +34,14 @@
 					label="本文"
 					:rules="bodyRule"
 					rows="16"
+					ref="body"
 				></v-textarea>
 			</v-flex>
 			<v-flex xs12 sm12 md6>
 				<MarkdownView :body="body" />
 			</v-flex>
 		</v-layout>
-		<v-btn color="success" @click="post">投稿</v-btn>
+		<v-btn color="success" type="submit">投稿</v-btn>
 	</v-form>
 </template>
 <script lang="ts">
@@ -50,6 +62,7 @@ export default class PostForm extends Vue {
 	subject: string = "";
 	body: string = "";
 	msg: string = "";
+	imageUrl: string = "";
 
 	get titleRule() {
 		return [
@@ -61,6 +74,49 @@ export default class PostForm extends Vue {
 		return [
 			(v: string) => v.length === 0 ? "本文を入力してください" : true,
 		];
+	}
+
+	copyUrl() {
+		const target = (this.$refs.url as any).$refs.input as HTMLInputElement;
+		target.select();
+		document.execCommand("copy");
+		// TODO: ほんとはbodyにfocusあてたいけど上手く当たらない。。
+	}
+
+	async uploadFile() {
+		const fileElement = this.$refs.inputUpload as HTMLInputElement;
+		if (fileElement.files == null || fileElement.files.length === 0) {
+			alert("選択してください");
+			return;
+		}
+
+		const ref = firebase.storage().ref(`user/${this.owner.id}/public`);
+		try {
+			const file = fileElement.files[0];
+			const metadata = {
+				contentType: file.type,
+			};
+			const ext = utils.getFilenameExtension(file.name);
+			if (! ext) {
+				alert("拡張子付きのファイルをアップロードしてください");
+				return;
+			}
+			const fileName = `${Date.now().toString(16)}.${ext}`;
+			const result = await ref.child(fileName).put(file, metadata);
+			if (result.state === "success") {
+				if (result.downloadURL == null) {
+					const downloadUrl = await result.ref.getDownloadURL();
+					console.log("getDownloadURL", downloadUrl);
+					this.imageUrl = downloadUrl;
+				} else {
+					this.imageUrl = result.downloadURL;
+				}
+			}
+		} catch (error) {
+			// TODO: show error
+			console.error("upload file error", error);
+		}
+
 	}
 
 	async post() {
