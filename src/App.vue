@@ -1,7 +1,6 @@
 <template>
 	<v-app>
-		<RegisterUser :user="store.user" />
-		<v-navigation-drawer temporary fixed v-model="drawer">
+		<v-navigation-drawer hide-overlay fixed v-model="drawer">
 			<v-list>
 				<v-list-tile to="/">
 					<v-list-tile-action>
@@ -62,6 +61,7 @@
 				<router-view/>
 			</v-container>
 		</v-content>
+		<RegisterUser :user="store.user" />
 	</v-app>
 </template>
 
