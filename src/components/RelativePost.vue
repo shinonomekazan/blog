@@ -14,7 +14,7 @@ import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import PostLink from "./PostLink.vue";
 import * as models from "../models";
 import * as factories from "../factories";
-import firebase from "firebase";
+import * as firebase from "firebase/app";
 import firestore = firebase.firestore;
 
 @Component({

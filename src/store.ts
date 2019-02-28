@@ -1,4 +1,4 @@
-import firebase from "firebase";
+import * as firebase from "firebase/app";
 import * as models from "./models";
 import * as factories from "./factories";
 
@@ -17,7 +17,6 @@ function getUserData(user: firebase.User): Promise<models.User> {
 				return;
 			}
 			const storeUser = users.docs[0].data() as models.StoreUser;
-			console.log(storeUser);
 			resolve(factories.createUser(user, storeUser));
 		}).catch(reject);
 	});

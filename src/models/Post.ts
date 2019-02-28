@@ -1,4 +1,4 @@
-import firebase from "firebase";
+import * as firebase from "firebase/app";
 export interface Post {
 	subject: string;
 	body: string;

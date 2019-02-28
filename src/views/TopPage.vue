@@ -11,7 +11,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import TopPostTitle from "../components/TopPostTitle.vue";
-import firebase from "firebase";
+import * as firebase from "firebase/app";
 import * as models from "../models";
 import * as factories from "../factories";
 
@@ -25,7 +25,6 @@ export default class TopPage extends Vue {
 	posts: models.AllPost[] = [];
 
 	async created() {
-		console.log("home created");
 		this.postRef = firebase.firestore().collection("allPosts");
 		try {
 			// TODO: キャッシュのライフサイクル的なものを設定して強めにきかせたい

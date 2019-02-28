@@ -20,7 +20,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import PostView from "../components/PostView.vue";
-import firebase from "firebase";
+import * as firebase from "firebase/app";
 import firestore = firebase.firestore;
 import * as models from "../models";
 import * as factories from "../factories";
@@ -97,7 +97,6 @@ export default class UserPosts extends Vue {
 	}
 
 	async created() {
-		console.log("user created", this.userName, this.since, this.order);
 		const userRef = firestore().collection("users").doc(this.userName);
 		try {
 			this.sinceId = this.since;

@@ -1,4 +1,5 @@
-import fierbase from "firebase";
+import * as firebase from "firebase/app";
+
 export interface User {
 	id: string;
 	displayName: string;

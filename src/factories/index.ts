@@ -1,4 +1,4 @@
-import firebase from "firebase";
+import * as firebase from "firebase/app";
 import * as models from "../models";
 
 export function createOwner(id: string, storeUser: models.StoreUser): models.Owner {

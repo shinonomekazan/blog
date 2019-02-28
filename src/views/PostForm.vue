@@ -47,7 +47,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import MarkdownView from "../components/MarkdownView.vue";
-import firebase from "firebase";
+import * as firebase from "firebase/app";
 import * as models from "../models";
 import * as factories from "../factories";
 import * as utils from "../utils";
@@ -120,8 +120,6 @@ export default class PostForm extends Vue {
 	}
 
 	async post() {
-		console.log("posted");
-		console.log("validate?", (this.$refs.postForm as HTMLFormElement).validate());
 		if (! (this.$refs.postForm as HTMLFormElement).validate()) {
 			return;
 		}
@@ -135,7 +133,6 @@ export default class PostForm extends Vue {
 			created: firebase.firestore.FieldValue.serverTimestamp(),
 			updated: firebase.firestore.FieldValue.serverTimestamp(),
 		} as models.Post;
-		console.log(post);
 		try {
 			await firebase.firestore().collection("users").doc(this.owner.name).collection("posts").add(post);
 			this.$_postForm_clear();

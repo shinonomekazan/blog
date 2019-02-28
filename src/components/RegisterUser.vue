@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import firebase from "firebase";
+import * as firebase from "firebase/app";
 import * as models from "../models";
 import {store} from "../store";
 import * as factories from "../factories";

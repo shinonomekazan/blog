@@ -9,7 +9,7 @@
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import PostView from "../components/PostView.vue";
 import RelativePost from "../components/RelativePost.vue";
-import firebase from "firebase";
+import * as firebase from "firebase/app";
 import firestore = firebase.firestore;
 import * as models from "../models";
 import * as factories from "../factories";
@@ -28,7 +28,6 @@ export default class UserPost extends Vue {
 	user: models.Owner | null = null;
 
 	async created() {
-		console.log("user post created", this.userName, this.postId);
 		const userRef = firestore().collection("users").doc(this.userName);
 		const storeUser = await userRef.get();
 		this.user = factories.createOwner(this.userName, storeUser.data() as models.StoreUser);

@@ -9,7 +9,7 @@
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import firebase from "firebase";
+import * as firebase from "firebase/app";
 import * as models from "../models";
 
 @Component({})
