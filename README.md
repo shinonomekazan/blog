@@ -36,8 +36,8 @@ Firebase側のソースは一応分けているので、必要に応じて[blog-
 - [カスタムトークン](https://firebase.google.com/docs/auth/admin/create-custom-tokens?hl=ja)対応
     - 本当はuserIdsドキュメントをやめてカスタムトークンでauthにuserNameを含めたいんですが、Firebaseのみでカスタムトークンを発行する方法がわからず断念
     - できるならやった上で、 [blog-serverのfirestore.rules](https://github.com/shinonomekazan/blog-server/blob/master/firestore.rules)のisOwnerを書き換えたい
-	- 今: `return get(/databases/$(database)/documents/userIds/$(uid)).data.name == name;`
-	- やりたい: 　`return request.auth.token.userName == name;`
+    - 今: `return get(/databases/$(database)/documents/userIds/$(uid)).data.name == name;`
+    - やりたい: 　`return request.auth.token.userName == name;`
 - [Nuxt.js](http://nuxtjs.org)対応
     - ブログシステムを作るなら当然OGPに対応したいのでSSRをやりたいので、Nuxt.jsを入れたいところ
     - これだけ対応したらなんならリリースできる
