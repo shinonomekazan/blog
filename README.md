@@ -28,8 +28,6 @@ Firebase側のソースは一応分けているので、必要に応じて[blog-
 
 - 更新と削除の対応
     - Firestoreのルール検証のためにも、そのうちやると思う
-- Firebaseのdevelopment deployをやめる
-    - 方法が今一つわかってないので調べたい
 
 ### 対応しないもの
 
