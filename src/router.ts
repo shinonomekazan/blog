@@ -8,16 +8,20 @@ import {store} from "./store";
 
 Vue.use(Router);
 
-function getInt(param: string | string[] | null, defaultValue: null | number = null) {
+function getInt(param: string | (string | null)[], defaultValue: null | number = null) {
 	if (param == null) {
 		return defaultValue;
 	}
 	if (typeof param === "string") {
 		return parseInt(param, 10);
 	}
-	return parseInt(param[0], 10);
+	const firstParam = param[0];
+	if (firstParam == null) {
+		return 0;
+	}
+	return parseInt(firstParam, 10);
 }
-function getOrder(param: string | string[] | null) {
+function getOrder(param: string | (string | null)[]) {
 	if (param === "asc") {
 		return "asc";
 	}
